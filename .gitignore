@@ -1,0 +1,13 @@
+# Fichiers d'environnement contenant des secrets
+.env
+
+# Répertoire de l'environnement virtuel Python
+.venv/
+venv/
+
+# Fichiers de cache Python
+__pycache__/
+*.pyc
+
+*.json
+.vscode/
