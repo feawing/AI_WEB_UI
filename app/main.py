@@ -152,8 +152,8 @@ async def client_to_agent_messaging(
 
 app = FastAPI()
 
-STATIC_DIR = Path("static")
-app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
+STATIC_DIR = Path("aisofime/static")
+app.mount("/aisofime/static", StaticFiles(directory=STATIC_DIR), name="static")
 
 
 @app.get("/aisofime/") 
