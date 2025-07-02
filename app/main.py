@@ -156,13 +156,13 @@ STATIC_DIR = Path("static")
 app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
 
 
-@app.get("/aisofime/")
+@app.get("/aisofime/") 
 async def root():
     """Serves the index.html"""
     return FileResponse(os.path.join(STATIC_DIR, "index.html"))
 
 
-@app.websocket("/ws/{session_id}")
+@app.websocket("/aisofime/ws/{session_id}")
 async def websocket_endpoint(
     websocket: WebSocket,
     session_id: str,
