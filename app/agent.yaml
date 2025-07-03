@@ -1,0 +1,9 @@
+# agent.yaml
+agent:
+  id: HostAgent
+  name: Agent Hôte
+  description: Un agent pour gérer les interactions de l'utilisateur avec les agents de relocation.
+  # ... autres configurations de l'agent ...
+
+server:
+  port: 10000 # Définissez votre port ici

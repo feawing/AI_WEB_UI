@@ -15,11 +15,28 @@ from google.adk.events.event import Event
 from google.adk.runners import Runner
 from google.adk.sessions.in_memory_session_service import InMemorySessionService
 from google.genai import types
+from a2a.server.apps import A2AStarletteApplication
+from a2a.server.request_handlers import DefaultRequestHandler
+from a2a.server.tasks import InMemoryTaskStore
+from a2a.types import (
+    AgentCapabilities,
+    AgentCard,
+    AgentSkill,
+)
+# web server
+import uvicorn
+#internal project imports
 from host_agent_adk.agent import HostAgent
+
 
 #
 # ADK Configuration
 #
+class MissingAPIKeyError(Exception):
+    """Exception for missing API key."""
+
+    pass
+
 
 # load_dotenv()
 
@@ -243,3 +260,74 @@ async def websocket_endpoint(
         print(f"ERROR: An error occurred for client #{session_id}: {e}")
         # Optionally, send an error to the client
         await websocket.send_text(json.dumps({"error": str(e)}))
+
+
+# --- Repris du main de l'app de demoa A2A
+def main():
+    """Starts the Host agent server."""
+    host = "localhost"
+    port = int(os.getenv("PORT_HOST_AGENT"))
+    url_path = os.getenv("URL_PATH_HOST_AGENT")
+    
+    try:
+        # Check for API key only if Vertex AI is not configured
+        if not os.getenv("GOOGLE_GENAI_USE_VERTEXAI") == "TRUE":
+            if not os.getenv("GOOGLE_API_KEY"):
+                raise MissingAPIKeyError(
+                    "GOOGLE_API_KEY environment variable not set and GOOGLE_GENAI_USE_VERTEXAI is not TRUE."
+                )
+
+        capabilities = AgentCapabilities(streaming=True)
+        skill = AgentSkill(
+            id="Check information about relocation",
+            name="Check relocation informations",
+            description="Gives informations about relocations by calling upon specialized agents",
+            tags=["relocations", "informations"],
+            examples=["What are the currently available relocations?"],
+        )
+
+        agent_card = AgentCard(
+            name="Host Agent",
+            description="An agent that manages user interactions with relocation agents.",
+            url=f"http://{host}:{port}/{url_path}",
+            version="1.0.0",
+            defaultInputModes=["text/plain"],
+            defaultOutputModes=["text/plain"],
+            capabilities=capabilities,
+            skills=[skill],
+        )
+
+        request_handler = DefaultRequestHandler(
+            agent_executor=HostAgent,
+            task_store=InMemoryTaskStore(),
+        )
+        
+#        runner = Runner(
+#            app_name="Host_Agent",
+#            agent=root_agent,
+#            artifact_service=InMemoryArtifactService(),
+#            session_service=InMemorySessionService(),
+#            memory_service=InMemoryMemoryService(),
+#        )
+        
+        server = A2AStarletteApplication( agent_card=agent_card, http_handler=request_handler
+        )
+        
+        agent_app = server.build()
+        for route in agent_app.routes:
+            app.router.routes.append(route)
+            
+        print(f"Server running on http://{host}:{port}/{url_path}")
+       
+        uvicorn.run(app, host=host, port=port)
+        
+    except MissingAPIKeyError as e:
+        print( f"Error: {e}")
+        exit(1)
+    except Exception as e:
+        print(f"An error occurred during server startup: {e}")
+        exit(1)
+
+
+if __name__ == "__main__":
+    main()
