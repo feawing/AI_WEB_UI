@@ -15,7 +15,7 @@ from google.adk.events.event import Event
 from google.adk.runners import Runner
 from google.adk.sessions.in_memory_session_service import InMemorySessionService
 from google.genai import types
-from jarvis.agent import root_agent
+from host_agent_adk.agent import HostAgent
 
 #
 # ADK Configuration
@@ -182,7 +182,7 @@ async def websocket_endpoint(
         )
         runner = Runner(
             app_name=APP_NAME,
-            agent=root_agent,
+            agent=HostAgent,
             session_service=session_service,
         )
         print(f"INFO: Agent session created for client #{session_id}.")
