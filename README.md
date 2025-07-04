@@ -1,158 +1,108 @@
-# Google Calendar Integration for ADK Voice Assistant
+# Using Google ADK and Google A2A protocol to get a Sofime chatbot access to Relo informations
 
-This document explains how to set up and use the Google Calendar integration with your ADK Voice Assistant.
+This document explains how to set up and use it
 
-## Setup Instructions
+## Setup Instructions 
 
 ### 1. Install Dependencies
 
-First, create a virtual environment:
-
+First, create two virtual environments:
 ```bash
 # Create a virtual environment
 python -m venv .venv
+python -m venv .venvstatus
 ```
 
-Activate the virtual environment:
-
+### 2. Activate the virtual environment:
 On Windows:
-```bash
+```powershell
 # Activate virtual environment on Windows
 .venv\Scripts\activate
 ```
-
 On macOS/Linux:
 ```bash
 # Activate virtual environment on macOS/Linux
 source .venv/bin/activate
 ```
-
-Then, install all required Python packages using pip:
-
+### 3. install all required Python packages using pip:
 ```bash
 # Install all dependencies
 pip install -r requirements.txt
 ```
 
-### 2. Set Up Gemini API Key
+### 4. activate .venvstatus and install all required Python package using pip 
+Each virtual environment is independant
 
-1. Create or use an existing [Google AI Studio](https://aistudio.google.com/) account
-2. Get your Gemini API key from the [API Keys section](https://aistudio.google.com/app/apikeys)
-3. Set the API key as an environment variable:
+### 5. Set up the .env file (most natably set up Gemini api key) in the project root dir
 
-Create a `.env` file in the project root with:
+Note: creation of API keys is at [Google AI Studio](https://aistudio.google.com/) 
+[API Keys section](https://aistudio.google.com/app/apikeys)
+Note : A2A procotol is a young Google specifications, Gemini models are more likely to handle it correctly (most notably on client side)
+Note bis: As of today 04/07/2025 Gemini 2.5 Pro Experimental is supposed to be the best model available. It's also a LOT more expensive than lighter or older gemini models. (see models description and princing at the bottom of this)
 
-```
-GOOGLE_API_KEY=your_api_key_here
-```
 
-### 3. Create a Google Cloud Project
+## Execution
 
-1. Go to the [Google Cloud Console](https://console.cloud.google.com/)
-2. Create a new project or select an existing one
-3. Enable the Google Calendar API for your project:
-   - In the sidebar, navigate to "APIs & Services" > "Library"
-   - Search for "Google Calendar API" and enable it
+First Server (Status) then Client (host)
+In two separate shells (to avoid ressource access conflict)
 
-### 4. Create OAuth 2.0 Credentials
+### (Server) Activate virtual Environment
+On windows powershell
+   .venvstatus/Scripts/activate
+On linux shell
+   source .venvstatus/Scripts/activate
 
-1. In the Google Cloud Console, navigate to "APIs & Services" > "Credentials"
-2. Click "Create Credentials" and select "OAuth client ID"
-3. For application type, select "Desktop application"
-4. Name your OAuth client (e.g., "ADK Voice Calendar Integration")
-5. Click "Create"
-6. Download the credentials JSON file
-7. Save the file as `credentials.json` in the root directory of this project
+### (server) select server directory
+cd app/status_agent_adk
 
-### 5. Run the Setup Script
+### (server) launch service
+uv run --active ./__main__.py --root-path /aisofimestatus
 
-Run the setup script to authenticate with Google Calendar:
+### (client) activate virtual enviroment
+On windows powershell
+   .venv/Scripts/activate
+On linux shell
+   source ./.venv/Scripts/activate
 
-```bash
-python setup_calendar_auth.py
-```
+### (client) select client directory
+cd app
 
-This will:
-1. Start the OAuth 2.0 authorization flow
-2. Open your browser to authorize the application
-3. Save the access token securely for future use
-4. Test the connection to your Google Calendar
+### (client) launch service
+uv run --active ./__main__.py
 
-## Working with Multiple Calendars
 
-The Google Calendar integration supports working with multiple calendars. The OAuth flow will grant access to all calendars associated with your Google account. You can:
 
-1. List all available calendars using the voice command "What calendars do I have access to?"
-2. Specify which calendar to use for operations by name or ID
-3. Use your primary calendar by default if no calendar is specified
+# API Usage
 
-Examples:
-- "Show me all my calendars"
-- "Create a meeting in my Work calendar" 
-- "What's on my Family calendar this weekend?"
+Application will consume Gemini credit on specified  Google account. 
+Can be tracked on google ai studio webpage.
 
-## Using the Calendar Integration
+## Model Capabilities
 
-Once set up, you can interact with your Google Calendar through the voice assistant:
+| Model | Description | Input Types | Best For |
+|-------|-------------|-------------|----------|
+| gemini-2.5-pro | Most powerful thinking model with maximum response accuracy | Audio, images, video, text | Complex coding, reasoning, multimodal understanding |
+| gemini-2.5-flash | Best price-performance balance | Audio, images, video, text | Low latency, high volume tasks that require thinking |
+| gemini-2.0-flash | Newest multimodal model with improved capabilities | Audio, images, video, text | Low latency, enhanced performance, agentic experiences |
+| gemini-2.0-flash-lite | Optimized for efficiency and speed | Audio, images, video, text | Cost efficiency and low latency |
+| gemini-1.5-flash | Versatile performance across diverse tasks | Audio, images, video, text | Fast and versatile performance |
+| gemini-1.5-flash-8b | Smaller, faster model | Audio, images, video, text | High volume and lower intelligence tasks |
+| gemini-1.5-pro | Powerful reasoning capabilities | Audio, images, video, text | Complex reasoning tasks requiring more intelligence |
 
-### Examples:
+## Pricing
 
-- "What's on my calendar today?"
-- "Show me my schedule for next week"
-- "Create a meeting with John tomorrow at 2 PM"
-- "Schedule a doctor's appointment for next Friday at 10 AM"
-- "Find a free time slot for a 30-minute meeting tomorrow"
-- "Delete my 3 PM meeting today"
-- "Reschedule my meeting with Sarah to Thursday at 11 AM"
-- "Change the title of my dentist appointment to 'Dental Cleaning'"
+| Model | Input Price | Output Price |
+|-------|-------------|-------------|
+| gemini-2.5-pro | $10.00 / 1M tokens | $30.00 / 1M tokens |
+| gemini-2.5-flash | $3.50 / 1M tokens | $10.50 / 1M tokens |
+| gemini-2.0-flash | $3.50 / 1M tokens | $10.50 / 1M tokens |
+| gemini-2.0-flash-lite | $0.70 / 1M tokens | $2.10 / 1M tokens |
+| gemini-1.5-flash | $2.50 / 1M tokens | $7.50 / 1M tokens |
+| gemini-1.5-flash-8b | $0.35 / 1M tokens | $1.05 / 1M tokens |
+| gemini-1.5-pro | $7.00 / 1M tokens | $21.00 / 1M tokens |
 
-## Running the Application
+## Token Information
 
-After completing the setup, you can run the application using the following command:
-
-```bash
-# Start the ADK Voice Assistant with hot-reloading enabled
-uvicorn main:app --reload
-```
-
-This will start the application server, and you can interact with your voice assistant through the provided interface.
-
-## Troubleshooting
-
-### Token Errors
-
-If you encounter authentication errors:
-
-1. Delete the token file at `~/.credentials/calendar_token.json`
-2. Run the setup script again
-
-### Permission Issues
-
-If you need additional calendar permissions:
-
-1. Delete the token file at `~/.credentials/calendar_token.json`
-2. Edit the `SCOPES` variable in `app/jarvis/tools/calendar_utils.py`
-3. Run the setup script again
-
-### API Quota
-
-Google Calendar API has usage quotas. If you hit quota limits:
-
-1. Check your [Google Cloud Console](https://console.cloud.google.com/)
-2. Navigate to "APIs & Services" > "Dashboard"
-3. Select "Google Calendar API"
-4. View your quota usage and consider upgrading if necessary
-
-### Package Installation Issues
-
-If you encounter issues installing the required packages:
-
-1. Make sure you're using Python 3.8 or newer
-2. Try upgrading pip: `pip install --upgrade pip`
-3. Install packages individually if a specific package is causing problems
-
-## Security Considerations
-
-- The OAuth token is stored securely in your user directory
-- Never share your `credentials.json` file or the generated token
-- The application only requests the minimum permissions needed for calendar operations
+- A token is approximately 4 characters
+- 100 tokens are roughly 60-80 English words
+- Pricing is calculated based on both input tokens (prompts sent to the model) and output tokens (responses generated by the model)

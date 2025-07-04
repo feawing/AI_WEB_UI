@@ -1,10 +1,12 @@
 import logging
 import os
 
+
 import uvicorn
 from a2a.server.apps import A2AStarletteApplication
 from a2a.server.request_handlers import DefaultRequestHandler
 from a2a.server.tasks import InMemoryTaskStore
+from starlette.routing import Mount
 from a2a.types import (
     AgentCapabilities,
     AgentCard,
@@ -35,6 +37,12 @@ def main():
     host = "localhost"
     port = int(os.getenv("PORT_STATUS_AGENT"))
     url_path = os.getenv("URL_PATH_STATUS_AGENT")
+    statusAgentUrl = f"http://{host}:{port}/{url_path}"
+    cardUrl = f"/.well-known/agent.json"
+    starletteAppRoute = f"/{url_path}"
+    print(f"Status Agent URL: {statusAgentUrl}")
+    print(f"Card URL: {cardUrl}")
+    print(f"Starlette App Route: {starletteAppRoute}")
     try:
         # Check for API key only if Vertex AI is not configured
         if not os.getenv("GOOGLE_GENAI_USE_VERTEXAI") == "TRUE":
@@ -61,7 +69,7 @@ def main():
         agent_card = AgentCard(
             name="Status Agent",
             description="An agent grant access to relocation status informations",
-            url=f"http://{host}:{port}/{url_path}",
+            url=statusAgentUrl,
             version="1.0.0",
             defaultInputModes=["text/plain"],
             defaultOutputModes=["text/plain"],
@@ -87,7 +95,8 @@ def main():
             agent_card=agent_card, http_handler=request_handler
         )
 
-        uvicorn.run(server.build(), host=host, port=port)
+        uvicorn.run(Mount(starletteAppRoute, server.build(agent_card_url=cardUrl)), host=host, port=port)
+        # uvicorn.run(server.build(), host=host, port=port) 
     except MissingAPIKeyError as e:
         logger.error(f"Error: {e}")
         exit(1)
