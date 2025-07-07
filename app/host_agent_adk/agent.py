@@ -18,6 +18,7 @@ from a2a.types import (
 )
 from dotenv import load_dotenv
 from google.adk import Agent
+from google.adk.agents import LlmAgent
 from google.adk.agents.readonly_context import ReadonlyContext
 from google.adk.artifacts import InMemoryArtifactService
 from google.adk.memory.in_memory_memory_service import InMemoryMemoryService
@@ -104,12 +105,11 @@ class HostAgent:
         await instance._async_init_components(remote_agent_addresses)
         return instance
 
-    def create_agent(self) -> Agent:
-        return Agent(
+    def create_agent(self) -> LlmAgent:
+        return LlmAgent(
             model=os.getenv("GEMINICLIENTMODEL"),
             name="Host_Agent",
-            instruction=self.root_instruction,
-            description="This Host agent gives access to relocation information for the user.",
+            instruction=self.root_instruction(None),
             tools=[
                 self.send_message,
             ],

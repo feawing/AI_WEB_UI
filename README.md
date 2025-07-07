@@ -4,6 +4,37 @@ This document explains how to set up and use it
 
 ## Setup Instructions 
 
+### Google Studio Credentials
+
+#### Préparation
+1. Installer Google Cloud SDK
+   Sous windows: sur le site de google : https://cloud.google.com/sdk/docs/install
+   Sous Ubuntu : sudo apt-get install google-cloud-sdk
+2. Lancer la commande pour génrter le fichier de credentials:
+   gcloud auth application-default login
+   Attention: relié à un compte google (actuellement maire@reflexe.fr)
+   --> le fichier doit etre dans %APPDATA%\gcloud\application_default_credentials.json
+
+#### Deploiement sur une VM en ligne: Création d'un compte de service 
+1. Créer le compte de service
+--> Console web du projet googlecloud
+----> Section IAM et Administration
+----> Comptes de service
+----> Créer un nouveau compte genre 'vm49-sofime-dev'
+----> Attribuer le rôle Utilisateur de Vertex AI
+2.Générer une clé pour le compte
+--> Toujours dans la console googlecloud / comptes de service
+--> Aller dans les détails du compte de service
+--> Onglet clés
+--> Ajouter une clé
+--> Créer une nouvelle clé au format json
+----> LE fichier généré est téléchargé. 
+3. Placer cette clé json sur la VM 
+--> Copier le fichier clé du compte de service
+----> Par exemple dans /etc/gcloud/service-acount-key.json
+----> Régler la variable d'environnement GOOGLE_APPLICATION_CREDENTIALS
+
+
 ### 1. Install Dependencies
 
 First, create two virtual environments:

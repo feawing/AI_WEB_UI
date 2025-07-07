@@ -26,7 +26,7 @@ from a2a.types import (
 # web server
 import uvicorn
 #internal project imports
-from host_agent_adk.agent import HostAgent
+from host_agent_adk.agent import HostAgent, root_agent
 
 
 #
@@ -192,14 +192,14 @@ async def websocket_endpoint(
 
     # Create a Session and Runner for this client
     try:
-        session = session_service.create_session(
+        session = await session_service.create_session(
             app_name=APP_NAME,
             user_id=session_id,
             session_id=session_id,
         )
         runner = Runner(
             app_name=APP_NAME,
-            agent=HostAgent,
+            agent=root_agent,
             session_service=session_service,
         )
         print(f"INFO: Agent session created for client #{session_id}.")
