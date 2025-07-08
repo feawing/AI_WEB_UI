@@ -272,11 +272,15 @@ def main():
     try:
         # Check for API key only if Vertex AI is not configured
         if not os.getenv("GOOGLE_GENAI_USE_VERTEXAI") == "TRUE":
+            print("INFO: Using Google API Key for API calls.")
             if not os.getenv("GOOGLE_API_KEY"):
                 raise MissingAPIKeyError(
                     "GOOGLE_API_KEY environment variable not set and GOOGLE_GENAI_USE_VERTEXAI is not TRUE."
                 )
+        else:
+            print("INFO: Using Vertex AI for API calls.")
 
+        # Check for API key only if Vertex AI is not configured
         capabilities = AgentCapabilities(streaming=True)
         skill = AgentSkill(
             id="Check information about relocation",

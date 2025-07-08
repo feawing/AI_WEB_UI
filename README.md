@@ -10,10 +10,14 @@ This document explains how to set up and use it
 1. Installer Google Cloud SDK
    Sous windows: sur le site de google : https://cloud.google.com/sdk/docs/install
    Sous Ubuntu : sudo apt-get install google-cloud-sdk
-2. Lancer la commande pour génrter le fichier de credentials:
+2. Lancer la commande pour générer le fichier de credentials:
    gcloud auth application-default login
    Attention: relié à un compte google (actuellement maire@reflexe.fr)
    --> le fichier doit etre dans %APPDATA%\gcloud\application_default_credentials.json
+3. Sur la console de projet google cloud
+---> IAM et administration
+---> Ajouter les utilisateurs avec le rôle éditeur
+
 
 #### Deploiement sur une VM en ligne: Création d'un compte de service 
 1. Créer le compte de service
@@ -29,10 +33,14 @@ This document explains how to set up and use it
 --> Ajouter une clé
 --> Créer une nouvelle clé au format json
 ----> LE fichier généré est téléchargé. 
-3. Placer cette clé json sur la VM 
---> Copier le fichier clé du compte de service
+3. Configurer gcloud pour s'authentifier
+--> Copier le fichier clé json du compte de service
 ----> Par exemple dans /etc/gcloud/service-acount-key.json
 ----> Régler la variable d'environnement GOOGLE_APPLICATION_CREDENTIALS
+------> export ou modif .bashrc
+4. Vérifier la connexion à GCloud
+--> python ./scripts/check_gcloud_auth.py
+
 
 
 ### 1. Install Dependencies
